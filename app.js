@@ -1,6 +1,6 @@
 var express = require('express'),
-  app = express(),
-  port = process.env.PORT || 8080,
+  app = module.exports.app = exports.app = express(),
+  port = process.env.PORT || 8000,
   uri = process.env.MONGOLAB_URI ||
         process.env.MONGOHQ_URL ||
         process.env.OPENSHIFT_MONGODB_DB_URL + process.env.OPENSHIFT_APP_NAME ||

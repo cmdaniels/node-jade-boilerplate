@@ -2,13 +2,9 @@ var dest = './_dist',
   src = '.';
 
 var gulp = require('gulp'),
-  browserSync = require('browser-sync'),
-  reload = browserSync.reload(),
   autoprefixer = require('gulp-autoprefixer'),
   changed = require('gulp-changed'),
   concat = require('gulp-concat'),
-  jshint = require('gulp-jshint'),
-  sylish = require('jshint-stylish'),
   del = require('del'),
   imagemin = require('gulp-imagemin'),
   pngquant = require('imagemin-pngquant'),
@@ -16,8 +12,10 @@ var gulp = require('gulp'),
   plumber = require('gulp-plumber'),
   sass = require('gulp-sass'),
   uglify = require('gulp-uglify'),
-  gutil = require('gulp-util').
-  ftp = require('vinyl-ftp');
+  gutil = require('gulp-util'),
+  ftp = require('vinyl-ftp'),
+  lr = require('tiny-lr')(),
+  server = require('gulp-express');
 
 var FTP_CONFIG = {
 		host: 'mywebsite.tld',
@@ -76,44 +74,35 @@ function errorAlert(error) {
 
 // Static Server + watching scss/html files
 gulp.task('serve', ['sass'], function() {
-  browserSync({
-    server: src
+  server.run(['app.js']);
+  gulp.watch(src + "/assets/sass/*.sass", function(event){
+        gulp.start('sass');
+        server.notify(event);
   });
-  gulp.watch(src + "/assets/sass/*.scss", ['sass']);
-  gulp.watch([src + "/assets/js/*.js"], ['js']);
-  gulp.watch(src + "/views/templates/*.jade").on('change', reload);
-  gulp.watch(src + "/views/*.jade").on('change', reload);
+  gulp.watch([src + "/assets/js/*.js", src + "/controllers/*.js", src + "/models/*.js"], function(event){
+        gulp.start('js');
+        server.run(['app.js']);
+  });
+  gulp.watch(src + "/views/templates/*.jade", server.notify);
+  gulp.watch(src + "/views/*.jade", server.notify);
 });
 
 // Compile sass into CSS & auto-inject into browsers
 gulp.task('sass', function() {
-  return gulp.src(src + "/assets/sass/*.scss")
+  return gulp.src(src + "/assets/sass/*.sass")
     .pipe(plumber({
       errorHandler: errorAlert
     }))
     .pipe(sass())
     .pipe(autoprefixer({
       browsers: ['chrome >= 40']
-    })) // no autprefixing needed in development
-    .pipe(gulp.dest(src + '/assets/css/'))
-    .pipe(reload({
-      stream: true
-    }));
-});
-
-// JShint
-gulp.task('jshint', function() {
-  return gulp.src([src + '/assets/js/*.js'])
-    .pipe(jshint())
-    .pipe(jshint.reporter('jshint-stylish'));
+    })) // no autoprefixing needed in development
+    .pipe(gulp.dest(src + '/assets/css/'));
 });
 
 // Lint JS first, then concat and minify
-gulp.task('js', ['jslint'], function() {
-  return gulp.src([src + '/assets/js/*.js'])  .pipe(concat('main.js'))    .pipe(gulp.dest(src + '/assets/js/'))
-    .pipe(reload({
-      stream: true
-    }));
+gulp.task('js', function() {
+  return gulp.src([src + '/assets/js/*.js'])  .pipe(concat('main.js'))    .pipe(gulp.dest(src + '/assets/js/'));
 });
 
 // compress images
@@ -142,7 +131,7 @@ gulp.task('sass-prod', function() {
     .pipe(gulp.dest(dest));
 });
 
-gulp.task('js-prod', ['jslint', 'controller-prod'], function() {
+gulp.task('js-prod', ['controller-prod'], function() {
   // uglify JS
   return gulp.src(src + '/assets/js/main.js')
     .pipe(uglify())
