@@ -100,14 +100,26 @@ gulp.task('sass', function() {
     .pipe(gulp.dest(src + '/assets/css/'));
 });
 
-// Lint JS first, then concat and minify
-gulp.task('js', function() {
-  return gulp.src([src + '/assets/js/*.js', "!" + src + "/assets/js/jquery*.js"])
+// Handle errors
+gulp.task('js', ['controller', 'model'], function() {
+  return gulp.src([src + '/assets/js/*.js'])
     .pipe(plumber({
       errorHandler: errorAlert
-    }))
-    .pipe(concat('main.js'))
-    .pipe(gulp.dest(src + '/assets/js/'));
+    }));
+});
+
+gulp.task('controller', function() {
+  return gulp.src([src + '/controllers/*.js'])
+    .pipe(plumber({
+      errorHandler: errorAlert
+    }));
+});
+
+gulp.task('model', function() {
+  return gulp.src([src + '/models/*.js'])
+    .pipe(plumber({
+      errorHandler: errorAlert
+    }));
 });
 
 // compress images
@@ -126,43 +138,37 @@ gulp.task('compress', function() {
 
 // PRODUCTION
 gulp.task('sass-prod', function() {
-  return gulp.src(src + "/assets/sass/*.scss")
+  return gulp.src(src + "/assets/sass/*.sass")
     .pipe(sass({
       outputStyle: 'compressed'
     }))
     .pipe(autoprefixer({
       browsers: AUTOPREFIXER_BROWSERS
     }))
-    .pipe(gulp.dest(dest));
+    .pipe(gulp.dest(dest + '/assets/css/'));
 });
 
-gulp.task('js-prod', ['controller-prod'], function() {
+gulp.task('js-prod', function() {
   // uglify JS
-  return gulp.src(src + '/assets/js/main.js')
+  return gulp.src(src + '/assets/js/')
     .pipe(uglify())
     .pipe(gulp.dest(dest + '/assets/js/'));
 });
 
-gulp.task('controller-prod', function() {
-  return gulp.src(src + '/controllers/*.js')
-    .pipe(uglify())
-    .pipe(gulp.dest(dest + '/controllers/'));
-});
-
 gulp.task('copy-files-root', function() {
-  // but do not copy the dev's style.css and the sass folder
-  return gulp.src([src + '/*', "!" + src + "/style.css", "!" + src + "/assets/sass"])
+  // but do not copy the assets folder
+  return gulp.src([src + '/*', "!" + src + "/assets"])
     .pipe(changed(dest))
     .pipe(gulp.dest(dest));
 });
 
 // Preparing files for production: First, run the 'js' task, afterwards ...
-gulp.task('production', ['js-prod', 'sass-prod', 'copy-files-root'], function() {
+gulp.task('production', ['compress', 'js-prod', 'sass-prod', 'copy-files-root'], function() {
   process.stdout.write("\nTo minify and copy images, run the 'compress'-task.\n\n");
 });
 
 // alias task name
-gulp.task('prod', ['js-prod', 'sass-prod', 'copy-files-root'], function() {
+gulp.task('prod', ['compress', 'js-prod', 'sass-prod', 'copy-files-root'], function() {
   process.stdout.write("\nTo minify and copy images, run the 'compress'-task.\n\n");
 });
 
