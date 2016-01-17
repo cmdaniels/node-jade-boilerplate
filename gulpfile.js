@@ -79,7 +79,7 @@ gulp.task('serve', ['sass'], function() {
         gulp.start('sass');
         server.notify(event);
   });
-  gulp.watch([src + "/assets/js/*.js", src + "/controllers/*.js", src + "/models/*.js"], function(event){
+  gulp.watch([src + "/assets/js/*.js", src + "/controllers/*.js", src + "/models/*.js", "!" + src + "/assets/js/jquery*.js"], function(event){
         gulp.start('js');
         server.run(['app.js']);
   });
