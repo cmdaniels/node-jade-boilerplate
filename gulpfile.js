@@ -150,27 +150,23 @@ gulp.task('sass-prod', function() {
 
 gulp.task('js-prod', function() {
   // uglify JS
-  return gulp.src(src + '/assets/js/')
+  return gulp.src(src + '/assets/js/*.js')
     .pipe(uglify())
     .pipe(gulp.dest(dest + '/assets/js/'));
 });
 
 gulp.task('copy-files-root', function() {
   // but do not copy the assets folder
-  return gulp.src([src + '/*', "!" + src + "/assets"])
+  return gulp.src([src + '/**/*', "!" + src + "/node_modules/**/*", "!" + src + "/_dist/**/*", "!" + src + "/_dist", "!" + src + "/assets/**/*"])
     .pipe(changed(dest))
     .pipe(gulp.dest(dest));
 });
 
 // Preparing files for production: First, run the 'js' task, afterwards ...
-gulp.task('production', ['compress', 'js-prod', 'sass-prod', 'copy-files-root'], function() {
-  process.stdout.write("\nTo minify and copy images, run the 'compress'-task.\n\n");
-});
+gulp.task('production', ['compress', 'js-prod', 'sass-prod', 'copy-files-root']);
 
 // alias task name
-gulp.task('prod', ['compress', 'js-prod', 'sass-prod', 'copy-files-root'], function() {
-  process.stdout.write("\nTo minify and copy images, run the 'compress'-task.\n\n");
-});
+gulp.task('prod', ['compress', 'js-prod', 'sass-prod', 'copy-files-root']);
 
 // Clean Output Directory
 gulp.task('clear', del.bind(null, [dest + '/**/*'], {
