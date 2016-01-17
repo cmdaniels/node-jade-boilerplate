@@ -30,3 +30,7 @@
 * `gulp clear`: deletes all files in your \_dist folder
 * `gulp prod` or `gulp production`: generates and copies all the files you need for deployment into the \_dist folder, requires you to run `npm install --production` manually within the folder
 * `gulp deploy`: uploads files in \_dist to your server using the configuration in gulpfile.js
+
+## Credits
+
+The gulpfile in this project is based on [designrubenz' jsidiots-gulpfile](https://github.com/designrubenz/jsidiots-gulpfile).
