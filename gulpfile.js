@@ -95,7 +95,7 @@ gulp.task('sass', function() {
     .pipe(autoprefixer({
       browsers: ['chrome >= 40']
     })) // no autprefixing needed in development
-    .pipe(gulp.dest(src))
+    .pipe(gulp.dest(src + '/assets/css/'))
     .pipe(reload({
       stream: true
     }));
