@@ -1,0 +1,11 @@
+{
+  "name": "node-boilerplate",
+  "version": "1.0.0",
+  "description": "A starting point for any node application",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "cmdaniels",
+  "license": "MIT"
+}
