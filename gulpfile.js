@@ -102,7 +102,12 @@ gulp.task('sass', function() {
 
 // Lint JS first, then concat and minify
 gulp.task('js', function() {
-  return gulp.src([src + '/assets/js/*.js'])  .pipe(concat('main.js'))    .pipe(gulp.dest(src + '/assets/js/'));
+  return gulp.src([src + '/assets/js/*.js', "!" + src + "/assets/js/jquery*.js"])
+    .pipe(plumber({
+      errorHandler: errorAlert
+    }))
+    .pipe(concat('main.js'))
+    .pipe(gulp.dest(src + '/assets/js/'));
 });
 
 // compress images
